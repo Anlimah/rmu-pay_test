@@ -29,14 +29,20 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         switch ($endpoint) {
             case '/pay':
                 $response = (new HandlePaymentController)->pay($_POST);
+                http_response_code(201);
                 break;
 
             case '/confirm':
                 $response = (new HandlePaymentController)->confirm($_POST);
+                http_response_code(201);
+                break;
+
+            default:
+                $response = array("resp_code" => "603", "message" => "Invalid endpoint requested: $endpoint");
+                http_response_code(404);
                 break;
         }
 
-        http_response_code(201);
         header("Content-Type: application/json");
         echo json_encode($response);
         break;
