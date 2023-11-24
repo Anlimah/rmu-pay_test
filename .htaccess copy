@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Set the HTTP_AUTHORIZATION environment variable
+RewriteCond %{HTTP:Authorization} .+
+RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Rewrite other URLs to your index.php file
+RewriteRule ^([^/]+)/? index.php?url=$1 [L,QSA]
