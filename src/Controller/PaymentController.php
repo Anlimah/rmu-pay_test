@@ -75,7 +75,7 @@ class PaymentController
     public function orchardPaymentController($data): mixed
     {
         $trans_id = time();
-        $callback_url = "https://test.pay.rmuictonline.com/confir";
+        $callback_url = "https://test.pay.rmuictonline.com/confirm";
         $payload = json_encode(array(
             "amount" => $data["amount"],
             "callback_url" => $callback_url,
