@@ -205,10 +205,10 @@ class VoucherPurchase
                 "Vendor " . $vendor_id[0]["vendor"] . " sold form with transaction ID {$trans_id}"
             );
 
-            $message = 'Your RMU Online Application login details. ';
+            $message = 'Your RMU Application login detail. ';
             $message .= 'APPLICATION NUMBER: RMU-' . $login_details['app_number'];
-            $message .= '    PIN: ' . $login_details['pin_number'] . ".";
-            $message .= ' Follow the link, https://admissions.rmuictonline.com to start application process.';
+            $message .= ', PIN: ' . $login_details['pin_number'] . ".";
+            $message .= ' Visit https://admissions.rmuictonline.com to start application process.';
             $to = $data[0]["country_code"] . $data[0]["phone_number"];
 
             $response = json_decode($this->expose->sendSMS($to, $message));
