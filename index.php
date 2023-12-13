@@ -47,6 +47,12 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         echo json_encode($response);
         break;
 
+    case 'GET':
+        header("HTTP/1.1 200 Ok");
+        header("Content-Type: application/json");
+        echo json_encode(array("response" => "Not permitted"));
+        break;
+
     default:
         header("HTTP/1.1 403 Forbidden");
         header("Content-Type: application/json");
