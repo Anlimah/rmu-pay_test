@@ -6,6 +6,7 @@ use Src\Controller\HandlePaymentController;
 
 switch ($_SERVER["REQUEST_METHOD"]) {
     case 'POST':
+
         // Check if the "CONTENT_TYPE" header is set
         if (!isset($_SERVER["CONTENT_TYPE"])) {
             http_response_code(400); // Bad Request
@@ -15,10 +16,51 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
 
         // Check if Content-Type header is set to json
-        if (strpos($_SERVER["CONTENT_TYPE"], "application/json") === false) {
+        if ($_SERVER["CONTENT_TYPE"] !== "application/json" || strpos($_SERVER["CONTENT_TYPE"], "application/json") === false) {
             http_response_code(415); // Unsupported Media Type
             header('Content-Type: application/json');
             echo json_encode(array("resp_code" => "602", "message" => "Only JSON-encoded requests are allowed."));
+            exit;
+        }
+
+        // Check for Basic Authorization header
+        $authorizationHeader = isset($_SERVER['HTTP_AUTHORIZATION']) ? $_SERVER['HTTP_AUTHORIZATION'] : '';
+
+        if (empty($authorizationHeader)) {
+            http_response_code(400); // Bad Request
+            header('Content-Type: application/json');
+            echo json_encode(array("resp_code" => "603", "message" => "No Authorization header information."));
+            exit;
+        }
+
+        if (strpos($authorizationHeader, 'Basic') === false) {
+            http_response_code(401); // Unauthorized
+            header('Content-Type: application/json');
+            header('WWW-Authenticate: Basic realm="API Authentication"');
+            echo json_encode(array("resp_code" => "604", "message" => "Basic Authorization required."));
+            exit;
+        }
+
+        // Extract username and password from the Basic Authorization header 12248579 TIAV0QMHC
+        $authCredentials = explode(':', base64_decode(substr($authorizationHeader, 6)), 2);
+        $authUsername = isset($authCredentials[0]) ? $authCredentials[0] : '';
+        $authPassword = isset($authCredentials[1]) ? $authCredentials[1] : '';
+
+        if (empty($authUsername) || empty($authPassword)) {
+            http_response_code(401); // Unauthorized
+            header('Content-Type: application/json');
+            header('WWW-Authenticate: Basic realm="API Authentication"');
+            echo json_encode(array("resp_code" => "605", "message" => "Authorization credentials required."));
+            exit;
+        }
+
+        $user = (new HandlePaymentController)->authenticateAccess($authUsername, $authPassword);
+
+        if (!$user) {
+            http_response_code(401); // Unauthorized
+            header('Content-Type: application/json');
+            header('WWW-Authenticate: Basic realm="API Authentication"');
+            echo json_encode(array("resp_code" => "606", "message" => "Invalid authorization credentials."));
             exit;
         }
 
